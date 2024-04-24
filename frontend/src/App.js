@@ -17,14 +17,22 @@ function App() {
   const [isEdited, setIsEdited] = useState(false);
   const [editedId, setEditedId] = useState(null);
   const [refresh, setRefresh] = useState(false);
-  const [text, setText] = useState('');
+  const [text, setText] = useState("");
+  const [searchText, setSeachText] = useState();
 
   useEffect(() => {
     axios
       .get("http://127.0.0.1:8000/api/todos")
-      .then((res) => setTodos(res.data))
+      .then((res) => {
+        setTodos(res.data.reverse());
+      })
       .catch((err) => console.log(err));
   }, [refresh]);
+
+  const searcHandler = async () => {
+    const values = todos.filter((todo) => todo.title.includes(searchText));
+    setTodos(values);
+  };
 
   const onChange = (e) => {
     setInputVal(e.target.value);
@@ -54,32 +62,11 @@ function App() {
     setIsEdited(false);
   };
 
-  const updateHandler = (id) => {
-    axios
-      .put("http://127.0.0.1:8000/api/todos", {
-        title: inputVal,
-        descriptions: "test",
-        amount: 100,
-      })
-      .then((res) => setRefresh(!refresh))
-      .catch((err) => console.log(err));
-  };
-
   const onDelete = (id) => {
     axios
       .delete(`http://127.0.0.1:8000/api/todos/${id}/delete`)
       .then((res) => setRefresh(!refresh))
       .catch((err) => console.log(err));
-  };
-
-  const handleDone = (id) => {
-    const updated = todos.map((todo) => {
-      if (todo.id === id) {
-        todo.isDone = !todo.isDone;
-      }
-      return todo;
-    });
-    setTodos(updated);
   };
 
   const handleEdit = (id) => {
@@ -93,6 +80,23 @@ function App() {
 
   return (
     <Container sx={{ textAlign: "center", marginTop: 10 }}>
+      <TextField
+        variant="outlined"
+        onChange={(e) => setSeachText(e.target.value)}
+        label="search your task"
+        value={searchText}
+        sx={{ width: "90%", marginBottom: 5 }}
+      />
+      <Button
+        size="large"
+        variant="contained"
+        color="primary"
+        onClick={searcHandler}
+        sx={{ height: 55, marginBottom: 3 }}
+        disabled={searchText ? false : true}
+      >
+        Search
+      </Button>
       <TextField
         variant="outlined"
         onChange={onChange}
