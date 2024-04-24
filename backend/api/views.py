@@ -25,14 +25,14 @@ class TodoView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def delete(self, request, pk):
-        Todo = self.get_object(pk=pk)
-        Todo.delete()
+        todo = self.get_object(pk=pk)
+        todo.delete()
         return Response("Todo deleted",status=status.HTTP_200_OK)
        
     
     def get_object(self, pk):
         try:
-            Todo = Todo.objects.get(pk=pk)
-            return Todo
-        except Todo.DoseNotExit:
+            todo = Todo.objects.get(pk=pk)
+            return todo
+        except todo.DoseNotExit:
             raise Http404
